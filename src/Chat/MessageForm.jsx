@@ -15,14 +15,8 @@ const ChatMessageForm = ( {
         }
 
         onSubmit( message )
-    }
 
-    const handleSubmitShortcut = event => {
-        if ( event.key === 'Enter' && ( event.ctrlKey || event.metaKey ) ) {
-            event.preventDefault()
-
-            event.target.form.requestSubmit()
-        }
+        event.target.reset()
     }
 
     return (
@@ -36,7 +30,6 @@ const ChatMessageForm = ( {
                 placeholder="Type a message..."
                 className="flex-grow border border-gray-300 rounded p-2"
                 autoFocus={ true }
-                onKeyDown={ handleSubmitShortcut }
             />
 
             <button
