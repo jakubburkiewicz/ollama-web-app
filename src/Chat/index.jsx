@@ -33,6 +33,8 @@ const Chat = () => {
         )
 
         const sendMessages = async () => {
+            let responseStream;
+
             const message = {
                 id: uuid(),
                 role: 'assistant',
@@ -45,14 +47,28 @@ const Chat = () => {
                 message
             } )
 
-            const responseStream = await ollama.chat( {
-                model: 'llama3',
-                messages: messages.map( message => ( {
-                    role: message.role,
-                    content: message.content
-                } ) ),
-                stream: true
-            } )
+            try {
+                responseStream = await ollama.chat( {
+                    model: 'llama3',
+                    messages: messages.map( message => ( {
+                        role: message.role,
+                        content: message.content
+                    } ) ),
+                    stream: true
+                } )
+            } catch( error ) {
+                console.log( error )
+
+                message.content = error.message
+                message.status = 'ERROR'
+
+                dispatch( {
+                    type: 'upsertMessage',
+                    message
+                } )
+
+                return
+            }
 
             for await ( const part of responseStream ) {
                 message.content += part.message.content
