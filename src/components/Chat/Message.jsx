@@ -1,4 +1,4 @@
-import BouncingDots from "../icons/BouncingDots"
+import BouncingDots from "../../icons/BouncingDots"
 
 const ChatMessage = ( {
     message,
