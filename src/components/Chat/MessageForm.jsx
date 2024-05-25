@@ -29,17 +29,17 @@ const ChatMessageForm = ( {
         setMessageContent( '' )
     }
 
-const handleSubmitShortcut = event => {
-    if( event.key === 'Enter' && ( event.ctrlKey || event.metaKey ) ) {
-        event.preventDefault()
+    const handleSubmitShortcut = event => {
+        if( event.key === 'Enter' && ( event.ctrlKey || event.metaKey ) ) {
+            event.preventDefault()
 
-        if ( !isMessageEmpty ) {
-            event.target.form.requestSubmit()
+            if ( !isMessageEmpty ) {
+                event.target.form.requestSubmit()
+            }
+        } else if( event.key === 'Enter' ) {
+            event.preventDefault()
         }
-    } else if( event.key === 'Enter' ) {
-        event.preventDefault()
     }
-}
 
     return (
         <form
