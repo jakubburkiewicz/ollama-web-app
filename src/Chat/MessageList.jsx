@@ -9,6 +9,7 @@ const ChatMessageList = ( {
                 key={ message.id }
                 message={ message.content }
                 role={ message.role }
+                status={ message.status }
             />
         ) ) }
     </section>

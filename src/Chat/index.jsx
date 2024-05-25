@@ -33,6 +33,18 @@ const Chat = () => {
         )
 
         const sendMessages = async () => {
+            const message = {
+                id: uuid(),
+                role: 'assistant',
+                content: '',
+                status: 'WAITING'
+            }
+
+            dispatch( {
+                type: 'upsertMessage',
+                message
+            } )
+
             const responseStream = await ollama.chat( {
                 model: 'llama3',
                 messages: messages.map( message => ( {
@@ -42,14 +54,9 @@ const Chat = () => {
                 stream: true
             } )
 
-            const message = {
-                id: uuid(),
-                role: 'assistant',
-                content: ''
-            }
-
             for await ( const part of responseStream ) {
                 message.content += part.message.content
+                message.status = part.done ? 'DONE' : 'PENDING'
 
                 dispatch( {
                     type: 'upsertMessage',
