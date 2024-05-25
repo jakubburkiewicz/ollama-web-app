@@ -50,7 +50,7 @@ const ChatMessageForm = ( {
             <input
                 type="text"
                 name="message"
-                placeholder="Type a message..."
+                placeholder="Type a message... (Cmd/Ctrl + Enter to send)"
                 className="flex-grow border border-gray-300 rounded p-2"
                 autoFocus={ true }
                 value={ messageContent }
