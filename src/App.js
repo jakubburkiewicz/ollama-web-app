@@ -1,9 +1,12 @@
 import Chat from './components/Chat';
+import { SettingsProvider } from './contexts/SettingsContext';
 
 const App = () => {
     return (
         <>
-            <Chat />
+            <SettingsProvider>
+                <Chat />
+            </SettingsProvider>
         </>
     )
 }

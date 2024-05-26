@@ -3,10 +3,15 @@ import { useEffect, useReducer } from "react"
 import ollama from "ollama/browser"
 import { v4 as uuid } from "uuid"
 
+import { useSettings } from "../../contexts/SettingsContext"
+
 import ChatMessageList from "./MessageList"
 import ChatMessageForm from "./MessageForm"
+import ChatSettingsForm from "./SettingsForm"
 
 const Chat = () => {
+    const { settings, settingsDispatch } = useSettings()
+
     const [ messages, dispatch ] = useReducer( ( state, action ) => {
         switch ( action.type ) {
             case 'upsertMessage': {
@@ -26,6 +31,26 @@ const Chat = () => {
             message
         } )
     }
+
+    useEffect( () => {
+        const fetchModels = async () => {
+            const response = await ollama.list()
+
+            settingsDispatch( {
+                type: 'setModelOptions',
+                models: response.models
+            } )
+
+            if( response.models.length ) {
+                settingsDispatch( {
+                    type: 'setModel',
+                    model: response.models[ 0 ]
+                } )
+            }
+        }
+
+        fetchModels()
+    }, [ settingsDispatch ] )
 
     useEffect( () => {
         const isLatestMessageFromUser = () => (
@@ -49,7 +74,7 @@ const Chat = () => {
 
             try {
                 responseStream = await ollama.chat( {
-                    model: 'llama3',
+                    model: settings.model.name,
                     messages: messages.map( message => ( {
                         role: message.role,
                         content: message.content
@@ -57,8 +82,6 @@ const Chat = () => {
                     stream: true
                 } )
             } catch( error ) {
-                console.log( error )
-
                 message.content = error.message
                 message.status = 'ERROR'
 
@@ -88,10 +111,12 @@ const Chat = () => {
         if( messages.length && isLatestMessageFromUser() ) {
             sendMessages()
         }
-    }, [ messages ] )
+    }, [ settings, messages ] )
 
     return (
         <section className="flex flex-col gap-4">
+            <ChatSettingsForm />
+
             <ChatMessageList
                 messages={ messages }
             />
