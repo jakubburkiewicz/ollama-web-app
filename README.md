@@ -34,7 +34,7 @@ For now, it only works with the local Ollama instance. (Will be upgraded soon).
 The chat interface allows the user to send messages to the Ollama instance and receive responses.
 
 <p align="center">
-  <img src="https://github.com/jakubburkiewicz/ollama-web-app/raw/0.1.0/ollama-web-app-screenshot.png" alt="Chat Screenshot">
+  <img src="https://raw.githubusercontent.com/jakubburkiewicz/ollama-web-app/main/ollama-web-app-screenshot.png" alt="Chat Screenshot">
 </p>
 
 #### Model Selection
