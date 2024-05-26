@@ -11,7 +11,7 @@ const ChatSettingsForm = () => {
     }
 
     return (
-        <div className="flex gap-4">
+        <div className="flex gap-4 bg-stone-100 p-4">
             <label className="flex flex-col gap-2">
                 <span className="text-sm">Model</span>
 

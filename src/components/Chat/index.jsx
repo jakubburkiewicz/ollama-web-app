@@ -114,7 +114,7 @@ const Chat = () => {
     }, [ settings, messages ] )
 
     return (
-        <section className="flex flex-col gap-4">
+        <section className="flex flex-col grow h-full">
             <ChatSettingsForm />
 
             <ChatMessageList

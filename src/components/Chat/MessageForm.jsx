@@ -45,7 +45,7 @@ const ChatMessageForm = ( {
         <form
             onSubmit={ handleMessageFormSubmit }
             onKeyDown={ handleSubmitShortcut }
-            className="flex flex-row gap-2"
+            className="flex flex-row gap-2 bg-stone-100 p-4"
         >
             <input
                 type="text"
