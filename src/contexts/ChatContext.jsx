@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from "react"
+import { createContext, useContext, useEffect, useReducer } from "react"
 
 const ChatContext = createContext()
 
@@ -24,7 +24,19 @@ const chatReducer = ( state, action ) => {
 }
 
 const ChatProvider = ( { children } ) => {
-    const [ chat, chatDispatch ] = useReducer( chatReducer, initialChat )
+    const [ chat, chatDispatch ] = useReducer( chatReducer, initialChat, initial => {
+        const storedChat = localStorage.getItem( 'ollama-web-app__chat' )
+
+        return storedChat ? JSON.parse( storedChat ) : initial
+    } )
+
+    useEffect( () => {
+        localStorage.setItem( 'ollama-web-app__chat', JSON.stringify( chat ) )
+
+        return () => {
+            localStorage.removeItem( 'ollama-web-app__chat' )
+        }
+    }, [ chat ] )
 
     return (
         <ChatContext.Provider value={ { chat, chatDispatch } }>
