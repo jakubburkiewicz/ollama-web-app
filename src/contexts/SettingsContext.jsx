@@ -3,12 +3,20 @@ import { createContext, useContext, useReducer } from "react"
 const SettingsContext = createContext()
 
 const initialSettings = {
+    host: 'localhost',
     model: '',
     modelOptions: []
 }
 
 const settingsReducer = ( state, action ) => {
     switch( action.type ) {
+        case 'setHost': {
+            return {
+                ...state,
+                host: action.host
+            }
+        }
+
         case 'setModel': {
             return {
                 ...state,

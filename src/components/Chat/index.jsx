@@ -1,6 +1,6 @@
 import { useEffect, useReducer } from "react"
 
-import ollama from "ollama/browser"
+import { Ollama } from "ollama/browser"
 import { v4 as uuid } from "uuid"
 
 import { useSettings } from "../../contexts/SettingsContext"
@@ -34,6 +34,7 @@ const Chat = () => {
 
     useEffect( () => {
         const fetchModels = async () => {
+            const ollama = new Ollama( { host: settings.host } )
             const response = await ollama.list()
 
             settingsDispatch( {
@@ -50,7 +51,7 @@ const Chat = () => {
         }
 
         fetchModels()
-    }, [ settingsDispatch ] )
+    }, [ settingsDispatch, settings.host ] )
 
     useEffect( () => {
         const isLatestMessageFromUser = () => (
@@ -73,6 +74,8 @@ const Chat = () => {
             } )
 
             try {
+                const ollama = new Ollama( { host: settings.host } )
+
                 responseStream = await ollama.chat( {
                     model: settings.model.name,
                     messages: messages.map( message => ( {
