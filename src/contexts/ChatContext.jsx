@@ -47,7 +47,12 @@ const ChatProvider = ( { children } ) => {
     } )
 
     useEffect( () => {
-        localStorage.setItem( 'ollama-web-app__chat', JSON.stringify( chat ) )
+        const history = {
+            model: chat.model,
+            messages: chat.messages
+        }
+
+        localStorage.setItem( 'ollama-web-app__chat', JSON.stringify( history ) )
     }, [ chat ] )
 
     return (
