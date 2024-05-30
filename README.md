@@ -34,7 +34,7 @@ For now, it only works with the local Ollama instance. (Will be upgraded soon).
 The chat interface allows the user to send messages to the Ollama instance and receive responses.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jakubburkiewicz/ollama-web-app/main/ollama-web-app-screenshot.png" alt="Chat Screenshot">
+  <img src="https://raw.githubusercontent.com/jakubburkiewicz/ollama-web-app/main/ollama-web-app-chat-screenshot.png" alt="Chat Screenshot">
 </p>
 
 #### Model Selection
@@ -50,6 +50,19 @@ The chat history is displayed in the chat interface.
 #### Message Input
 
 The user can input messages to send to the Ollama instance.
+
+### Settings
+
+The settings interface allows the user to configure the Ollama instance.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jakubburkiewicz/ollama-web-app/main/ollama-web-app-settings-screenshot.png" alt="Settings Screenshot">
+</p>
+
+#### Host
+
+The user can set the host of the Ollama instance.
+Change is applied immediately, so when the user backs to the chat interface, the models list is fetched from the new host.
 
 ## License
 
