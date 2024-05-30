@@ -4,6 +4,7 @@ import { Ollama } from "ollama/browser"
 import { v4 as uuid } from "uuid"
 
 import { useSettings } from "../../contexts/SettingsContext"
+import { useChat } from "../../contexts/ChatContext"
 
 import ChatMessageList from "./MessageList"
 import ChatMessageForm from "./MessageForm"
@@ -11,22 +12,10 @@ import ChatSettingsForm from "./SettingsForm"
 
 const Chat = () => {
     const { settings, settingsDispatch } = useSettings()
-
-    const [ messages, dispatch ] = useReducer( ( state, action ) => {
-        switch ( action.type ) {
-            case 'upsertMessage': {
-                return state.some( message => message.id === action.message.id )
-                    ? state.map( message => message.id === action.message.id ? action.message : message )
-                    : [ ...state, action.message ]
-            }
-            default: {
-                return state
-            }
-        }
-    }, [] )
+    const { chat, chatDispatch } = useChat()
 
     const handleNewUserMessage = message => {
-        dispatch( {
+        chatDispatch( {
             type: 'upsertMessage',
             message
         } )
@@ -55,7 +44,7 @@ const Chat = () => {
 
     useEffect( () => {
         const isLatestMessageFromUser = () => (
-            messages[ messages.length - 1 ]?.role === 'user'
+            chat.messages[ chat.messages.length - 1 ]?.role === 'user'
         )
 
         const sendMessages = async () => {
@@ -68,7 +57,7 @@ const Chat = () => {
                 status: 'WAITING'
             }
 
-            dispatch( {
+            chatDispatch( {
                 type: 'upsertMessage',
                 message
             } )
@@ -78,7 +67,7 @@ const Chat = () => {
 
                 responseStream = await ollama.chat( {
                     model: settings.model.name,
-                    messages: messages.map( message => ( {
+                    messages: chat.messages.map( message => ( {
                         role: message.role,
                         content: message.content
                     } ) ),
@@ -88,7 +77,7 @@ const Chat = () => {
                 message.content = error.message
                 message.status = 'ERROR'
 
-                dispatch( {
+                chatDispatch( {
                     type: 'upsertMessage',
                     message
                 } )
@@ -100,7 +89,7 @@ const Chat = () => {
                 message.content += part.message.content
                 message.status = part.done ? 'DONE' : 'PENDING'
 
-                dispatch( {
+                chatDispatch( {
                     type: 'upsertMessage',
                     message
                 } )
@@ -111,17 +100,17 @@ const Chat = () => {
             }
         }
 
-        if( messages.length && isLatestMessageFromUser() ) {
+        if( chat.messages.length && isLatestMessageFromUser() ) {
             sendMessages()
         }
-    }, [ settings, messages ] )
+    }, [ settings, chat.messages ] )
 
     return (
         <section className="flex flex-col grow h-full">
             <ChatSettingsForm />
 
             <ChatMessageList
-                messages={ messages }
+                messages={ chat.messages }
             />
 
             <ChatMessageForm
