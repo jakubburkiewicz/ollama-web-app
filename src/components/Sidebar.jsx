@@ -7,7 +7,7 @@ import {
 import LeftTriangleArrow from "../icons/LeftTriangleArrow"
 
 const Sidebar = () => (
-    <nav className="flex flex-col gap-2 w-20 h-full py-4 bg-gray-200">
+    <nav className="flex flex-col gap-2 w-20 h-full py-4 bg-gray-200 grow-0 shrink-0">
         <NavLink
             to="/"
             className="w-full h-12 text-gray-700 flex items-center justify-center relative"
