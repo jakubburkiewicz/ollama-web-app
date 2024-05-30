@@ -1,11 +1,9 @@
-import { createContext, useContext, useReducer } from "react"
+import { createContext, useContext, useEffect, useReducer } from "react"
 
 const SettingsContext = createContext()
 
 const initialSettings = {
-    host: 'localhost',
-    model: '',
-    modelOptions: []
+    host: 'localhost'
 }
 
 const settingsReducer = ( state, action ) => {
@@ -38,7 +36,19 @@ const settingsReducer = ( state, action ) => {
 }
 
 const SettingsProvider = ( { children } ) => {
-    const [ settings, settingsDispatch ] = useReducer( settingsReducer, initialSettings )
+    const [ settings, settingsDispatch ] = useReducer( settingsReducer, initialSettings, initial => {
+        const storedSettings = localStorage.getItem( 'ollama-web-app__settings' )
+
+        return storedSettings ? JSON.parse( storedSettings ) : initial
+    } )
+
+    useEffect( () => {
+        localStorage.setItem( 'ollama-web-app__settings', JSON.stringify( settings ) )
+
+        return () => {
+            localStorage.removeItem( 'ollama-web-app__settings' )
+        }
+    }, [ settings ] )
 
     return (
         <SettingsContext.Provider value={ { settings, settingsDispatch } }>

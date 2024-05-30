@@ -2,9 +2,10 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 import Chat from './components/Chat';
 import Sidebar from './components/Sidebar';
+import Settings from './components/Settings';
 
 import { SettingsProvider } from './contexts/SettingsContext';
-import Settings from './components/Settings';
+import { ChatProvider } from './contexts/ChatContext';
 
 const App = () => {
     return (
@@ -16,7 +17,11 @@ const App = () => {
                     <Routes>
                         <Route
                             path="/"
-                            element={ <Chat /> }
+                            element={
+                                <ChatProvider>
+                                    <Chat />
+                                </ChatProvider>
+                            }
                         />
 
                         <Route

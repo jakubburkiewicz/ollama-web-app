@@ -1,61 +1,29 @@
-import { useEffect, useReducer } from "react"
+import { useEffect } from "react"
 
 import { Ollama } from "ollama/browser"
 import { v4 as uuid } from "uuid"
 
 import { useSettings } from "../../contexts/SettingsContext"
+import { useChat } from "../../contexts/ChatContext"
 
 import ChatMessageList from "./MessageList"
 import ChatMessageForm from "./MessageForm"
 import ChatSettingsForm from "./SettingsForm"
 
 const Chat = () => {
-    const { settings, settingsDispatch } = useSettings()
-
-    const [ messages, dispatch ] = useReducer( ( state, action ) => {
-        switch ( action.type ) {
-            case 'upsertMessage': {
-                return state.some( message => message.id === action.message.id )
-                    ? state.map( message => message.id === action.message.id ? action.message : message )
-                    : [ ...state, action.message ]
-            }
-            default: {
-                return state
-            }
-        }
-    }, [] )
+    const { settings } = useSettings()
+    const { chat, chatDispatch } = useChat()
 
     const handleNewUserMessage = message => {
-        dispatch( {
+        chatDispatch( {
             type: 'upsertMessage',
             message
         } )
     }
 
     useEffect( () => {
-        const fetchModels = async () => {
-            const ollama = new Ollama( { host: settings.host } )
-            const response = await ollama.list()
-
-            settingsDispatch( {
-                type: 'setModelOptions',
-                models: response.models
-            } )
-
-            if( response.models.length ) {
-                settingsDispatch( {
-                    type: 'setModel',
-                    model: response.models[ 0 ]
-                } )
-            }
-        }
-
-        fetchModels()
-    }, [ settingsDispatch, settings.host ] )
-
-    useEffect( () => {
         const isLatestMessageFromUser = () => (
-            messages[ messages.length - 1 ]?.role === 'user'
+            chat.messages[ chat.messages.length - 1 ]?.role === 'user'
         )
 
         const sendMessages = async () => {
@@ -68,7 +36,7 @@ const Chat = () => {
                 status: 'WAITING'
             }
 
-            dispatch( {
+            chatDispatch( {
                 type: 'upsertMessage',
                 message
             } )
@@ -77,8 +45,8 @@ const Chat = () => {
                 const ollama = new Ollama( { host: settings.host } )
 
                 responseStream = await ollama.chat( {
-                    model: settings.model.name,
-                    messages: messages.map( message => ( {
+                    model: chat.model,
+                    messages: chat.messages.map( message => ( {
                         role: message.role,
                         content: message.content
                     } ) ),
@@ -88,7 +56,7 @@ const Chat = () => {
                 message.content = error.message
                 message.status = 'ERROR'
 
-                dispatch( {
+                chatDispatch( {
                     type: 'upsertMessage',
                     message
                 } )
@@ -100,7 +68,7 @@ const Chat = () => {
                 message.content += part.message.content
                 message.status = part.done ? 'DONE' : 'PENDING'
 
-                dispatch( {
+                chatDispatch( {
                     type: 'upsertMessage',
                     message
                 } )
@@ -111,17 +79,17 @@ const Chat = () => {
             }
         }
 
-        if( messages.length && isLatestMessageFromUser() ) {
+        if( chat.messages.length && isLatestMessageFromUser() ) {
             sendMessages()
         }
-    }, [ settings, messages ] )
+    }, [ settings, chat.messages, chatDispatch ] )
 
     return (
         <section className="flex flex-col grow h-full">
             <ChatSettingsForm />
 
             <ChatMessageList
-                messages={ messages }
+                messages={ chat.messages }
             />
 
             <ChatMessageForm

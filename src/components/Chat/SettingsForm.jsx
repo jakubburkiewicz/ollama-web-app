@@ -1,12 +1,39 @@
+import { useEffect } from "react"
+
+import { Ollama } from "ollama/browser"
+
+import { useChat } from "../../contexts/ChatContext"
 import { useSettings } from "../../contexts/SettingsContext"
 
 const ChatSettingsForm = () => {
-    const { settings, settingsDispatch } = useSettings()
+    const { settings } = useSettings()
+    const { chat, chatDispatch } = useChat()
+
+    useEffect( () => {
+        const fetchModels = async () => {
+            const ollama = new Ollama( { host: settings.host } )
+            const response = await ollama.list()
+
+            chatDispatch( {
+                type: 'setModelOptions',
+                models: response.models
+            } )
+
+            if( response.models.length ) {
+                chatDispatch( {
+                    type: 'setModel',
+                    model: response.models[ 0 ].name
+                } )
+            }
+        }
+
+        fetchModels()
+    }, [ chatDispatch, settings.host ] )
 
     const handleModelChange = event => {
-        settingsDispatch( {
+        chatDispatch( {
             type: 'setModel',
-            model: settings.modelOptions.find( model => model.name === event.target.value )
+            model: event.target.value
         } )
     }
 
@@ -17,11 +44,11 @@ const ChatSettingsForm = () => {
 
                 <select
                     className="p-2 rounded border border-gray-300 w-48 h-10"
-                    value={ settings.model.name }
+                    value={ chat.model.name }
                     onChange={ handleModelChange }
                 >
                     {
-                        settings?.modelOptions?.map( model => (
+                        chat?.modelOptions?.map( model => (
                             <option
                                 key={ model.digest }
                                 value={ model.name }
