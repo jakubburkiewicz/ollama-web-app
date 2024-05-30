@@ -3,11 +3,27 @@ import { createContext, useContext, useEffect, useReducer } from "react"
 const ChatContext = createContext()
 
 const initialChat = {
+    model: '',
+    modelOptions: [],
     messages: []
 }
 
 const chatReducer = ( state, action ) => {
     switch( action.type ) {
+        case 'setModel': {
+            return {
+                ...state,
+                model: action.model
+            }
+        }
+
+        case 'setModelOptions': {
+            return {
+                ...state,
+                modelOptions: action.models
+            }
+        }
+
         case 'upsertMessage': {
             return {
                 ...state,

@@ -3,9 +3,7 @@ import { createContext, useContext, useEffect, useReducer } from "react"
 const SettingsContext = createContext()
 
 const initialSettings = {
-    host: 'localhost',
-    model: '',
-    modelOptions: []
+    host: 'localhost'
 }
 
 const settingsReducer = ( state, action ) => {

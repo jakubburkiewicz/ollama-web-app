@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react"
+import { useEffect } from "react"
 
 import { Ollama } from "ollama/browser"
 import { v4 as uuid } from "uuid"
@@ -11,7 +11,7 @@ import ChatMessageForm from "./MessageForm"
 import ChatSettingsForm from "./SettingsForm"
 
 const Chat = () => {
-    const { settings, settingsDispatch } = useSettings()
+    const { settings } = useSettings()
     const { chat, chatDispatch } = useChat()
 
     const handleNewUserMessage = message => {
@@ -20,27 +20,6 @@ const Chat = () => {
             message
         } )
     }
-
-    useEffect( () => {
-        const fetchModels = async () => {
-            const ollama = new Ollama( { host: settings.host } )
-            const response = await ollama.list()
-
-            settingsDispatch( {
-                type: 'setModelOptions',
-                models: response.models
-            } )
-
-            if( response.models.length ) {
-                settingsDispatch( {
-                    type: 'setModel',
-                    model: response.models[ 0 ]
-                } )
-            }
-        }
-
-        fetchModels()
-    }, [ settingsDispatch, settings.host ] )
 
     useEffect( () => {
         const isLatestMessageFromUser = () => (
@@ -66,7 +45,7 @@ const Chat = () => {
                 const ollama = new Ollama( { host: settings.host } )
 
                 responseStream = await ollama.chat( {
-                    model: settings.model.name,
+                    model: chat.model,
                     messages: chat.messages.map( message => ( {
                         role: message.role,
                         content: message.content
@@ -103,7 +82,7 @@ const Chat = () => {
         if( chat.messages.length && isLatestMessageFromUser() ) {
             sendMessages()
         }
-    }, [ settings, chat.messages ] )
+    }, [ settings, chat.messages, chatDispatch ] )
 
     return (
         <section className="flex flex-col grow h-full">
