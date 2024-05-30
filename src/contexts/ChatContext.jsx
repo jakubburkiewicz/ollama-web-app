@@ -48,10 +48,6 @@ const ChatProvider = ( { children } ) => {
 
     useEffect( () => {
         localStorage.setItem( 'ollama-web-app__chat', JSON.stringify( chat ) )
-
-        return () => {
-            localStorage.removeItem( 'ollama-web-app__chat' )
-        }
     }, [ chat ] )
 
     return (
