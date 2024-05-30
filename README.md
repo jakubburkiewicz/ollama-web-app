@@ -23,9 +23,8 @@ Alternatively, you can run `npm start` to start a development server.
 
 ## Usage
 
-The app is a simple web interface for the Ollama project. It allows the user to interact with the Ollama API without the need of a command line interface.
-
-For now, it only works with the local Ollama instance. (Will be upgraded soon).
+The app is a simple web interface for the Ollama project.\
+t allows the user to interact with the Ollama API without the need of a command line interface.
 
 ## Features
 
@@ -39,13 +38,14 @@ The chat interface allows the user to send messages to the Ollama instance and r
 
 #### Model Selection
 
-The user can select the model to use for the chat.
-
+The user can select the model to use for the chat.\
 List of models are fetched from the Ollama instance.
 
 #### Chat History
 
 The chat history is displayed in the chat interface.
+
+All messages and chat settings are stored in the browser's local storage, so the user can see the chat history even after refreshing the page.
 
 #### Message Input
 
@@ -55,13 +55,16 @@ The user can input messages to send to the Ollama instance.
 
 The settings interface allows the user to configure the Ollama instance.
 
+App comes with default settings, but the user can change them.\
+All settings are stored in the browser's local storage.
+
 <p align="center">
   <img src="https://raw.githubusercontent.com/jakubburkiewicz/ollama-web-app/main/ollama-web-app-settings-screenshot.png" alt="Settings Screenshot">
 </p>
 
 #### Host
 
-The user can set the host of the Ollama instance.
+The user can set the host of the Ollama instance.\
 Change is applied immediately, so when the user backs to the chat interface, the models list is fetched from the new host.
 
 ## License
