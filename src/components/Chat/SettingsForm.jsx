@@ -1,19 +1,24 @@
 import { useEffect } from "react"
 
-import { Ollama } from "ollama/browser"
+import { useOllama } from "use-ollama"
 
 import { useChat } from "../../contexts/ChatContext"
-import { useSettings } from "../../contexts/SettingsContext"
+
 
 const ChatSettingsForm = () => {
-    const { settings } = useSettings()
-    const { chat, chatDispatch } = useChat()
+    const { chatState, chatDispatch } = useChat()
+    const { list, response, error } = useOllama()
 
     useEffect( () => {
         const fetchModels = async () => {
-            const ollama = new Ollama( { host: settings.host } )
-            const response = await ollama.list()
+            await list()
+        }
 
+        fetchModels()
+    }, [] )
+
+    useEffect( () => {
+        const setModelOptions = async models => {
             chatDispatch( {
                 type: 'setModelOptions',
                 models: response.models
@@ -27,8 +32,16 @@ const ChatSettingsForm = () => {
             }
         }
 
-        fetchModels()
-    }, [ chatDispatch, settings.host ] )
+        if( response ) {
+            setModelOptions( response.models )
+        }
+    }, [ response ] )
+
+    useEffect( () => {
+        if( error ) {
+            console.error( error )
+        }
+    }, [ error ] )
 
     const handleModelChange = event => {
         chatDispatch( {
@@ -44,11 +57,11 @@ const ChatSettingsForm = () => {
 
                 <select
                     className="p-2 rounded border border-gray-300 w-48 h-10"
-                    value={ chat.model.name }
+                    value={ chatState.model.name }
                     onChange={ handleModelChange }
                 >
                     {
-                        chat?.modelOptions?.map( model => (
+                        chatState?.modelOptions?.map( model => (
                             <option
                                 key={ model.digest }
                                 value={ model.name }
