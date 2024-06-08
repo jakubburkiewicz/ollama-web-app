@@ -1,18 +1,18 @@
 import { useEffect } from "react"
 
-import { Ollama } from "ollama/browser"
+import { useOllama } from "use-ollama"
 import { v4 as uuid } from "uuid"
 
-import { useSettings } from "../../contexts/SettingsContext"
 import { useChat } from "../../contexts/ChatContext"
 
 import ChatMessageList from "./MessageList"
 import ChatMessageForm from "./MessageForm"
 import ChatSettingsForm from "./SettingsForm"
 
+
 const Chat = () => {
-    const { settings } = useSettings()
-    const { chat, chatDispatch } = useChat()
+    const { chat, response, error } = useOllama()
+    const { chatState, chatDispatch } = useChat()
 
     const handleNewUserMessage = message => {
         chatDispatch( {
@@ -23,12 +23,10 @@ const Chat = () => {
 
     useEffect( () => {
         const isLatestMessageFromUser = () => (
-            chat.messages[ chat.messages.length - 1 ]?.role === 'user'
+            chatState.messages[ chatState.messages.length - 1 ]?.role === 'user'
         )
 
         const sendMessages = async () => {
-            let responseStream;
-
             const message = {
                 id: uuid(),
                 role: 'assistant',
@@ -41,30 +39,26 @@ const Chat = () => {
                 message
             } )
 
-            try {
-                const ollama = new Ollama( { host: settings.host } )
+            await chat( {
+                model: chatState.model,
+                messages: chatState.messages.map( message => ( {
+                    role: message.role,
+                    content: message.content
+                } ) ),
+                stream: true
+            } )
+        }
 
-                responseStream = await ollama.chat( {
-                    model: chat.model,
-                    messages: chat.messages.map( message => ( {
-                        role: message.role,
-                        content: message.content
-                    } ) ),
-                    stream: true
-                } )
-            } catch( error ) {
-                message.content = error.message
-                message.status = 'ERROR'
+        if( chatState.messages.length && isLatestMessageFromUser() ) {
+            sendMessages()
+        }
+    }, [ chat, chatDispatch, chatState.messages, chatState.model ] )
 
-                chatDispatch( {
-                    type: 'upsertMessage',
-                    message
-                } )
+    useEffect( () => {
+        const collectResponseMessage = async response => {
+            const message = chatState.messages[ chatState.messages.length - 1 ]
 
-                return
-            }
-
-            for await ( const part of responseStream ) {
+            for await ( const part of response ) {
                 message.content += part.message.content
                 message.status = part.done ? 'DONE' : 'PENDING'
 
@@ -79,17 +73,35 @@ const Chat = () => {
             }
         }
 
-        if( chat.messages.length && isLatestMessageFromUser() ) {
-            sendMessages()
+        if( response ) {
+            collectResponseMessage( response )
         }
-    }, [ settings, chat.messages, chatDispatch ] )
+    }, [ response, chatDispatch, chatState.messages ] )
+
+    useEffect( () => {
+        const handleErrorMessage = error => {
+            const message = chatState.messages[ chatState.messages.length - 1 ]
+
+            message.content = error.message
+            message.status = 'ERROR'
+
+            chatDispatch( {
+                type: 'upsertMessage',
+                message
+            } )
+        }
+
+        if( error ) {
+            handleErrorMessage( error )
+        }
+    }, [ error ] )
 
     return (
         <section className="flex flex-col grow h-full">
             <ChatSettingsForm />
 
             <ChatMessageList
-                messages={ chat.messages }
+                messages={ chatState.messages }
             />
 
             <ChatMessageForm
