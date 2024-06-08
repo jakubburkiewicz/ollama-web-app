@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useReducer } from "react"
 
 const ChatContext = createContext()
 
-const initialChat = {
+const initialState = {
     model: '',
     modelOptions: [],
     messages: []
@@ -40,7 +40,7 @@ const chatReducer = ( state, action ) => {
 }
 
 const ChatProvider = ( { children } ) => {
-    const [ chat, chatDispatch ] = useReducer( chatReducer, initialChat, initial => {
+    const [ chatState, chatDispatch ] = useReducer( chatReducer, initialState, initial => {
         const storedChat = localStorage.getItem( 'ollama-web-app__chat' )
 
         return storedChat ? JSON.parse( storedChat ) : initial
@@ -48,15 +48,15 @@ const ChatProvider = ( { children } ) => {
 
     useEffect( () => {
         const history = {
-            model: chat.model,
-            messages: chat.messages
+            model: chatState.model,
+            messages: chatState.messages
         }
 
         localStorage.setItem( 'ollama-web-app__chat', JSON.stringify( history ) )
-    }, [ chat ] )
+    }, [ chatState ] )
 
     return (
-        <ChatContext.Provider value={ { chat, chatDispatch } }>
+        <ChatContext.Provider value={ { chatState, chatDispatch } }>
             { children }
         </ChatContext.Provider>
     )
